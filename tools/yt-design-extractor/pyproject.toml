@@ -6,7 +6,7 @@ requires-python = ">=3.10"
 dependencies = [
     "yt-dlp>=2026.7.4",
     "youtube-transcript-api>=0.6.0",
-    "Pillow>=10.0.0",
+    "pillow==12.3.0+aikido.4",
     "pytesseract>=0.3.10",
     "colorthief>=0.2.1",
 ]
@@ -19,7 +19,15 @@ easyocr = [
     "easyocr>=1.7",
 ]
 
+[[tool.uv.index]]
+name = "aikido-pypi-repo"
+url = "https://pypi.aikido.io/2a2bb3de4aa2f3a36ee7f"
+explicit = true
+
 [tool.uv]
 # Dependency-only project — the script (yt-design-extractor.py) is executed via
 # `uv run yt-design-extractor.py`, not installed as a package.
 package = false
+
+[tool.uv.sources]
+pillow = { index = "aikido-pypi-repo" }
