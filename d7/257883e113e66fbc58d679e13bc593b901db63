@@ -1,0 +1,16 @@
+tools/tests/test_yt_extractor_security.py
+  h_43bd93ed2f90ff 41
+tools/yt-design-extractor/yt-design-extractor.py
+  h_43bd93ed2f90ff 92-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d7257883e113e66fbc58d679e13bc593b901db63",
+  "prompts": {},
+  "humans": {
+    "h_43bd93ed2f90ff": {
+      "author": "Aaron Strasler <Aaron.M.Strasler@outlook.com>"
+    }
+  }
+}
