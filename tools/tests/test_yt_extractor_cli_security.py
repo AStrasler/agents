@@ -35,9 +35,7 @@ class ExtractorInputSecurityTests(unittest.TestCase):
 
     def test_metadata_and_download_receive_only_canonical_video_url(self):
         video_id = "abcDEF12345"
-        untrusted_url = (
-            f"https://www.youtube.com/watch?v={video_id}&--exec=/tmp/marker"
-        )
+        untrusted_url = f"https://www.youtube.com/watch?v={video_id}&--exec=/tmp/marker"
         canonical_url = f"https://www.youtube.com/watch?v={video_id}"
 
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -51,13 +49,9 @@ class ExtractorInputSecurityTests(unittest.TestCase):
                     return_value={"title": "test", "channel": "test", "duration": 0},
                 ) as metadata,
                 patch.object(EXTRACTOR, "get_transcript", return_value=None),
-                patch.object(
-                    EXTRACTOR, "download_video", return_value=unused_video
-                ) as download,
+                patch.object(EXTRACTOR, "download_video", return_value=unused_video) as download,
                 patch.object(EXTRACTOR, "extract_frames_interval", return_value=[]),
-                patch.object(
-                    EXTRACTOR, "build_markdown", return_value=output_dir / "result.md"
-                ),
+                patch.object(EXTRACTOR, "build_markdown", return_value=output_dir / "result.md"),
                 patch.object(
                     sys,
                     "argv",
