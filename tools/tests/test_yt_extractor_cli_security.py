@@ -3,7 +3,6 @@ import importlib.util
 import sys
 import tempfile
 import unittest
-
 from pathlib import Path
 from unittest.mock import patch
 
@@ -27,9 +26,9 @@ class ExtractorInputSecurityTests(unittest.TestCase):
             patch.object(EXTRACTOR, "get_video_metadata") as metadata,
             patch.object(EXTRACTOR, "download_video") as download,
             patch.object(sys, "argv", [str(SCRIPT), "https://youtube.com/watch?v=invalid"]),
+            self.assertRaises(SystemExit),
         ):
-            with self.assertRaises(SystemExit):
-                EXTRACTOR.main()
+            EXTRACTOR.main()
 
         metadata.assert_not_called()
         download.assert_not_called()
