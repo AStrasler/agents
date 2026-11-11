@@ -7,14 +7,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-MODULE_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "yt-design-extractor"
-    / "yt-design-extractor.py"
-)
-spec = importlib.util.spec_from_file_location(
-    "yt_design_extractor_security", MODULE_PATH
-)
+MODULE_PATH = Path(__file__).resolve().parents[1] / "yt-design-extractor" / "yt-design-extractor.py"
+spec = importlib.util.spec_from_file_location("yt_design_extractor_security", MODULE_PATH)
 extractor = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(extractor)
 
@@ -70,12 +64,8 @@ class YoutubeSubprocessTests(unittest.TestCase):
             expected_file = directory / "video.mp4"
             expected_file.write_bytes(b"test")
             completed = subprocess.CompletedProcess([], 0, "", "")
-            with patch.object(
-                extractor.subprocess, "run", return_value=completed
-            ) as run:
-                self.assertEqual(
-                    extractor.download_video(VIDEO_ID, directory), expected_file
-                )
+            with patch.object(extractor.subprocess, "run", return_value=completed) as run:
+                self.assertEqual(extractor.download_video(VIDEO_ID, directory), expected_file)
             self.assertEqual(run.call_args.args[0][-2:], ["--", CANONICAL])
             self.assertIs(run.call_args.kwargs["shell"], False)
 
@@ -87,9 +77,7 @@ class YoutubeSubprocessTests(unittest.TestCase):
                 tempfile.TemporaryDirectory() as folder,
                 self.assertRaises(SystemExit),
             ):
-                extractor.download_video(
-                    "https://evil.example/watch?v=" + VIDEO_ID, Path(folder)
-                )
+                extractor.download_video("https://evil.example/watch?v=" + VIDEO_ID, Path(folder))
             run.assert_not_called()
 
 
