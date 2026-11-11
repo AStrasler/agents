@@ -21,6 +21,19 @@ SPEC.loader.exec_module(EXTRACTOR)
 
 
 class ExtractorInputSecurityTests(unittest.TestCase):
+    def test_invalid_video_id_exits_before_metadata_or_download(self):
+        with (
+            patch.object(EXTRACTOR.shutil, "which", return_value="/bin/tool"),
+            patch.object(EXTRACTOR, "get_video_metadata") as metadata,
+            patch.object(EXTRACTOR, "download_video") as download,
+            patch.object(sys, "argv", [str(SCRIPT), "https://youtube.com/watch?v=invalid"]),
+        ):
+            with self.assertRaises(SystemExit):
+                EXTRACTOR.main()
+
+        metadata.assert_not_called()
+        download.assert_not_called()
+
     def test_metadata_and_download_receive_only_canonical_video_url(self):
         video_id = "abcDEF12345"
         untrusted_url = (
