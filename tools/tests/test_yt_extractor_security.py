@@ -9,6 +9,8 @@ from unittest.mock import patch
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "yt-design-extractor" / "yt-design-extractor.py"
 spec = importlib.util.spec_from_file_location("yt_design_extractor_security", MODULE_PATH)
+if spec is None or spec.loader is None:
+    raise RuntimeError("could not load yt-design-extractor module")
 extractor = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(extractor)
 
