@@ -684,11 +684,14 @@ def main():
         )
 
     video_id = extract_video_id(args.url)
+    # Pass a canonical URL derived from the validated 11-character ID to yt-dlp,
+    # so user-supplied URL text cannot be interpreted as downloader options.
+    video_url = f"https://www.youtube.com/watch?v={video_id}"
     out_dir = Path(args.output_dir or f"./yt-extract-{video_id}")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Metadata
-    meta = get_video_metadata(args.url)
+    meta = get_video_metadata(video_url)
 
     # Dump raw metadata for future reference
     (out_dir / "metadata.json").write_text(
@@ -710,7 +713,7 @@ def main():
     color_analysis: dict = {}
 
     if not args.transcript_only:
-        video_path = download_video(args.url, out_dir)
+        video_path = download_video(video_url, out_dir)
         try:
             interval_frames = extract_frames_interval(video_path, out_dir, interval=args.interval)
             if args.scene_detect:
