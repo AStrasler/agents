@@ -22,7 +22,7 @@ import json
 import os
 import re
 import shutil
-import subprocess
+import subprocess  # nosec B404
 import sys
 from pathlib import Path
 
@@ -49,13 +49,14 @@ def _run(
     timeout: int = _TIMEOUT,
 ) -> subprocess.CompletedProcess:
     """Run a subprocess with a tight timeout and capture stdout/stderr."""
-    return subprocess.run(
+    return subprocess.run(  # nosec B603
         args,
         capture_output=True,
         text=True,
         timeout=timeout,
         cwd=str(cwd) if cwd else None,
         env=env,
+        shell=False,
     )
 
 
@@ -69,13 +70,14 @@ def _run_stdout_to_file(args: list[str], cwd: Path, sink_dir: Path) -> subproces
     """
     sink = sink_dir / "stdout.txt"
     with sink.open("w") as fh:
-        proc = subprocess.run(
+        proc = subprocess.run(  # nosec B603
             args,
             stdout=fh,
             stderr=subprocess.PIPE,
             text=True,
             timeout=_TIMEOUT,
             cwd=str(cwd),
+            shell=False,
         )
     return subprocess.CompletedProcess(args, proc.returncode, sink.read_text(), proc.stderr)
 

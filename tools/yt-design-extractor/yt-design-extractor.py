@@ -28,7 +28,7 @@ import json
 import os
 import re
 import shutil
-import subprocess
+import subprocess  # nosec B404
 import sys
 import textwrap
 from collections import Counter
@@ -101,7 +101,7 @@ def get_video_metadata(url: str) -> dict:
     ]
     print("[*] Fetching video metadata …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120, shell=False)  # nosec B603
     except subprocess.TimeoutExpired:
         sys.exit("yt-dlp metadata fetch timed out after 120s.")
     if result.returncode != 0:
@@ -166,7 +166,7 @@ def download_video(url: str, out_dir: Path) -> Path:
     ]
     print("[*] Downloading video (720p preferred) …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600, shell=False)  # nosec B603
     except subprocess.TimeoutExpired:
         sys.exit(
             "Video download timed out after 10 minutes. "
@@ -200,7 +200,7 @@ def extract_frames_interval(video_path: Path, out_dir: Path, interval: int = 30)
     ]
     print(f"[*] Extracting frames every {interval}s …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600, shell=False)  # nosec B603
     except subprocess.TimeoutExpired:
         sys.exit("Frame extraction timed out after 10 minutes.")
     if result.returncode != 0:
@@ -238,7 +238,7 @@ def extract_frames_scene(video_path: Path, out_dir: Path, threshold: float = 0.3
     ]
     print(f"[*] Extracting scene-change frames (threshold={threshold}) …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600, shell=False)  # nosec B603
     except subprocess.TimeoutExpired:
         sys.exit("Scene-change frame extraction timed out after 10 minutes.")
     if result.returncode != 0:

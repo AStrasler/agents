@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-import subprocess
+import subprocess  # nosec B404
 import sys
 import tempfile
 import textwrap
@@ -66,11 +66,12 @@ class SelectionValidationTest(unittest.TestCase):
         )
 
     def test_cli_accepts_repository_manifest(self) -> None:
-        proc = subprocess.run(
+        proc = subprocess.run(  # nosec B603
             [sys.executable, str(SCRIPT), "--root", str(ROOT)],
             check=False,
             capture_output=True,
             text=True,
+            shell=False,
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertIn("OK: 5 selection entries", proc.stdout)
@@ -180,11 +181,12 @@ class SelectionValidationTest(unittest.TestCase):
             manifest = root / "egregore" / "selection.yaml"
             manifest.parent.mkdir()
             manifest.write_text("schema_version: 2\n", encoding="utf-8")
-            proc = subprocess.run(
+            proc = subprocess.run(  # nosec B603
                 [sys.executable, str(SCRIPT), "--root", str(root), "--manifest", str(manifest)],
                 check=False,
                 capture_output=True,
                 text=True,
+                shell=False,
             )
         self.assertEqual(proc.returncode, 1)
         self.assertIn("error:", proc.stderr)
