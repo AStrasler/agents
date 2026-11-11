@@ -38,6 +38,7 @@ class YoutubeSubprocessTests(unittest.TestCase):
             "file:///tmp/video", "https://www.youtube.com/watch?v=" + VIDEO_ID + ";--exec",
             "https://youtube.com/watch?v=" + VIDEO_ID + "&v=aaaaaaaaaaa",
             "https://youtu.be/" + VIDEO_ID + "/evil",
+            "http://[bad", "https://[::1/watch?v=" + VIDEO_ID,  # urlsplit raises ValueError
         ):
             with self.subTest(source=source):
                 with self.assertRaises(SystemExit):

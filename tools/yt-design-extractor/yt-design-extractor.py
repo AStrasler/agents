@@ -83,13 +83,14 @@ def extract_video_id(url: str) -> str:
     if re.fullmatch(r"[A-Za-z0-9_-]{11}", value):
         return value
 
-    parsed = urlsplit(value if "://" in value else "https://" + value)
     hosts = {
         "youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com",
         "youtu.be", "www.youtu.be", "youtube-nocookie.com",
         "www.youtube-nocookie.com",
     }
     try:
+        # urlsplit itself raises ValueError on malformed hosts such as "http://[bad"
+        parsed = urlsplit(value if "://" in value else "https://" + value)
         safe_origin = (
             parsed.scheme in {"http", "https"}
             and parsed.hostname in hosts
