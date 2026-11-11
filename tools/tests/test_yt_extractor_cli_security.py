@@ -7,11 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-SCRIPT = (
-    Path(__file__).resolve().parents[1]
-    / "yt-design-extractor"
-    / "yt-design-extractor.py"
-)
+SCRIPT = Path(__file__).resolve().parents[1] / "yt-design-extractor" / "yt-design-extractor.py"
 SPEC = importlib.util.spec_from_file_location("yt_design_extractor", SCRIPT)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError("could not load yt-design-extractor module")
