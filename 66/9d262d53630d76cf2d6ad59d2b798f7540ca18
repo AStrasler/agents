@@ -1,0 +1,25 @@
+tools/tests/test_yt_extractor_security.py
+  s_2467b4e7c1e9d3::t_99992ee11fcc18 3,43-44,69-73
+egregore/test_validate_selection.py
+  s_2467b4e7c1e9d3::t_ccdd78e4586a75 69,184
+tools/yt-design-extractor/yt-design-extractor.py
+  s_2467b4e7c1e9d3::t_ccdd78e4586a75 242-244,282-284
+tools/tests/test_cli_smoke.py
+  s_2467b4e7c1e9d3::t_6981aacee61d4a 52,73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "669d262d53630d76cf2d6ad59d2b798f7540ca18",
+  "prompts": {},
+  "sessions": {
+    "s_2467b4e7c1e9d3": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1ca20-9bd8-7b31-9a5d-8a496aa086a2",
+        "model": "gpt-6-luna"
+      },
+      "human_author": "Aaron Strasler <Aaron.M.Strasler@outlook.com>"
+    }
+  }
+}
