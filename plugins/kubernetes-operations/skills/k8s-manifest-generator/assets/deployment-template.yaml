@@ -64,8 +64,12 @@ spec:
         command: ['sh', '-c', 'echo "Initializing..."']
         securityContext:
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
 
       containers:
       - name: <container-name>
