@@ -1,0 +1,22 @@
+egregore/test_validate_selection.py
+  h_43bd93ed2f90ff 6,69,74,184,189
+plugins/plugin-eval/tests/test_eval_all.py
+  h_43bd93ed2f90ff 1
+tools/tests/test_cli_smoke.py
+  h_43bd93ed2f90ff 25,52,59,73,80
+tools/yt-design-extractor/uv.lock
+  h_43bd93ed2f90ff 229,231,233
+tools/yt-design-extractor/yt-design-extractor.py
+  h_43bd93ed2f90ff 31,104,169,203,241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "98086450ad6bed964aad66bd30929f32db06c49b",
+  "prompts": {},
+  "humans": {
+    "h_43bd93ed2f90ff": {
+      "author": "Aaron Strasler <Aaron.M.Strasler@outlook.com>"
+    }
+  }
+}
