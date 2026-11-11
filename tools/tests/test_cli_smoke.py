@@ -49,7 +49,7 @@ def _run(
     timeout: int = _TIMEOUT,
 ) -> subprocess.CompletedProcess:
     """Run a subprocess with a tight timeout and capture stdout/stderr."""
-    return subprocess.run(  # nosec B603
+    return subprocess.run(  # nosec B603 -- test callers pass fixed CLI commands and controlled test paths
         args,
         capture_output=True,
         text=True,
@@ -70,7 +70,7 @@ def _run_stdout_to_file(args: list[str], cwd: Path, sink_dir: Path) -> subproces
     """
     sink = sink_dir / "stdout.txt"
     with sink.open("w") as fh:
-        proc = subprocess.run(  # nosec B603
+        proc = subprocess.run(  # nosec B603 -- test callers pass fixed CLI commands and controlled test paths
             args,
             stdout=fh,
             stderr=subprocess.PIPE,

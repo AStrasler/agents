@@ -239,7 +239,9 @@ def extract_frames_interval(video_path: Path, out_dir: Path, interval: int = 30)
     ]
     print(f"[*] Extracting frames every {interval}s …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600, shell=False)  # nosec B603
+        result = subprocess.run(  # nosec B603: fixed ffmpeg args and local video path; no shell
+            cmd, capture_output=True, text=True, timeout=600, shell=False
+        )
     except subprocess.TimeoutExpired:
         sys.exit("Frame extraction timed out after 10 minutes.")
     if result.returncode != 0:
@@ -277,7 +279,9 @@ def extract_frames_scene(video_path: Path, out_dir: Path, threshold: float = 0.3
     ]
     print(f"[*] Extracting scene-change frames (threshold={threshold}) …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600, shell=False)  # nosec B603
+        result = subprocess.run(  # nosec B603: fixed ffmpeg args and local video path; no shell
+            cmd, capture_output=True, text=True, timeout=600, shell=False
+        )
     except subprocess.TimeoutExpired:
         sys.exit("Scene-change frame extraction timed out after 10 minutes.")
     if result.returncode != 0:

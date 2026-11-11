@@ -66,7 +66,7 @@ class SelectionValidationTest(unittest.TestCase):
         )
 
     def test_cli_accepts_repository_manifest(self) -> None:
-        proc = subprocess.run(  # nosec B603
+        proc = subprocess.run(  # nosec B603 -- test uses sys.executable and test-defined paths
             [sys.executable, str(SCRIPT), "--root", str(ROOT)],
             check=False,
             capture_output=True,
@@ -181,7 +181,7 @@ class SelectionValidationTest(unittest.TestCase):
             manifest = root / "egregore" / "selection.yaml"
             manifest.parent.mkdir()
             manifest.write_text("schema_version: 2\n", encoding="utf-8")
-            proc = subprocess.run(  # nosec B603
+            proc = subprocess.run(  # nosec B603 -- test uses sys.executable and test-defined paths
                 [sys.executable, str(SCRIPT), "--root", str(root), "--manifest", str(manifest)],
                 check=False,
                 capture_output=True,

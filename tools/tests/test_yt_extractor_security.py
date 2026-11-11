@@ -1,6 +1,6 @@
 """Regression tests for yt-dlp URL normalization and option injection."""
 import importlib.util
-import subprocess
+import subprocess  # nosec B404
 import tempfile
 import unittest
 from pathlib import Path
@@ -40,9 +40,8 @@ class YoutubeSubprocessTests(unittest.TestCase):
             "https://youtu.be/" + VIDEO_ID + "/evil",
             "http://[bad", "https://[::1/watch?v=" + VIDEO_ID,  # urlsplit raises ValueError
         ):
-            with self.subTest(source=source):
-                with self.assertRaises(SystemExit):
-                    extractor.extract_video_id(source)
+            with self.subTest(source=source), self.assertRaises(SystemExit):
+                extractor.extract_video_id(source)
 
     def test_metadata_uses_only_canonical_url_after_terminator(self):
         completed = subprocess.CompletedProcess([], 0, '{"id":"ok"}', "")
@@ -67,9 +66,11 @@ class YoutubeSubprocessTests(unittest.TestCase):
         with patch.object(extractor.subprocess, "run") as run:
             with self.assertRaises(SystemExit):
                 extractor.get_video_metadata("--exec")
-            with tempfile.TemporaryDirectory() as folder:
-                with self.assertRaises(SystemExit):
-                    extractor.download_video("https://evil.example/watch?v=" + VIDEO_ID, Path(folder))
+            with (
+                tempfile.TemporaryDirectory() as folder,
+                self.assertRaises(SystemExit),
+            ):
+                extractor.download_video("https://evil.example/watch?v=" + VIDEO_ID, Path(folder))
             run.assert_not_called()
 
 
