@@ -790,7 +790,7 @@ def check_agent_divergence(report: Report) -> None:
             if raw is None:
                 continue
             normalized = normalized_agent_text(raw)
-            bodies[hashlib.md5(normalized.encode("utf-8")).hexdigest()].append(path)
+            bodies[hashlib.sha256(normalized.encode("utf-8")).hexdigest()].append(path)
 
         if len(bodies) > 1:
             variants = " | ".join(
