@@ -35,6 +35,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 # Optional imports - gracefully degrade if not available
 PILLOW_AVAILABLE = False
@@ -74,20 +75,51 @@ except ImportError:
 
 
 def extract_video_id(url: str) -> str:
-    """Pull the 11-char video ID out of any common YouTube URL format."""
-    patterns = [
-        r"(?:v=|/v/|youtu\.be/)([a-zA-Z0-9_-]{11})",
-        r"(?:embed/)([a-zA-Z0-9_-]{11})",
-        r"(?:shorts/)([a-zA-Z0-9_-]{11})",
-    ]
-    for pat in patterns:
-        m = re.search(pat, url)
-        if m:
-            return m.group(1)
-    # Maybe the user passed a bare ID
-    if re.match(r"^[a-zA-Z0-9_-]{11}$", url):
-        return url
-    sys.exit(f"Could not extract video ID from: {url}")
+    """Extract an exact ID from a trusted YouTube URL or a bare video ID."""
+    if not isinstance(url, str):
+        sys.exit("Expected a YouTube URL or 11-character video ID.")
+
+    value = url.strip()
+    if re.fullmatch(r"[A-Za-z0-9_-]{11}", value):
+        return value
+
+    parsed = urlsplit(value if "://" in value else "https://" + value)
+    hosts = {
+        "youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com",
+        "youtu.be", "www.youtu.be", "youtube-nocookie.com",
+        "www.youtube-nocookie.com",
+    }
+    try:
+        safe_origin = (
+            parsed.scheme in {"http", "https"}
+            and parsed.hostname in hosts
+            and parsed.username is None
+            and parsed.password is None
+            and parsed.port is None
+        )
+    except ValueError:
+        safe_origin = False
+    if not safe_origin:
+        sys.exit("Unsupported YouTube URL.")
+
+    parts = [part for part in parsed.path.split("/") if part]
+    if parsed.hostname in {"youtu.be", "www.youtu.be"} and len(parts) == 1:
+        video_id = parts[0]
+    elif parts == ["watch"]:
+        values = parse_qs(parsed.query).get("v", [])
+        video_id = values[0] if len(values) == 1 else ""
+    elif len(parts) == 2 and parts[0] in {"v", "embed", "shorts"}:
+        video_id = parts[1]
+    else:
+        video_id = ""
+    if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
+        sys.exit("Could not extract a valid YouTube video ID.")
+    return video_id
+
+
+def canonical_watch_url(url: str) -> str:
+    """Normalize user input before passing anything to yt-dlp."""
+    return "https://www.youtube.com/watch?v=" + extract_video_id(url)
 
 
 def get_video_metadata(url: str) -> dict:
@@ -97,11 +129,14 @@ def get_video_metadata(url: str) -> dict:
         "--dump-json",
         "--no-download",
         "--no-playlist",
-        url,
+        "--",
+        canonical_watch_url(url),
     ]
     print("[*] Fetching video metadata …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120, shell=False)  # nosec B603
+        result = subprocess.run(  # nosec B603: canonical URL, no shell
+            cmd, capture_output=True, text=True, timeout=120, shell=False
+        )
     except subprocess.TimeoutExpired:
         sys.exit("yt-dlp metadata fetch timed out after 120s.")
     if result.returncode != 0:
@@ -162,11 +197,14 @@ def download_video(url: str, out_dir: Path) -> Path:
         "-o",
         out_template,
         "--no-playlist",
-        url,
+        "--",
+        canonical_watch_url(url),
     ]
     print("[*] Downloading video (720p preferred) …")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600, shell=False)  # nosec B603
+        result = subprocess.run(  # nosec B603: canonical URL, no shell
+            cmd, capture_output=True, text=True, timeout=600, shell=False
+        )
     except subprocess.TimeoutExpired:
         sys.exit(
             "Video download timed out after 10 minutes. "
@@ -688,7 +726,8 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Metadata
-    meta = get_video_metadata(args.url)
+    canonical_url = canonical_watch_url(args.url)
+    meta = get_video_metadata(canonical_url)
 
     # Dump raw metadata for future reference
     (out_dir / "metadata.json").write_text(
@@ -710,7 +749,7 @@ def main():
     color_analysis: dict = {}
 
     if not args.transcript_only:
-        video_path = download_video(args.url, out_dir)
+        video_path = download_video(canonical_url, out_dir)
         try:
             interval_frames = extract_frames_interval(video_path, out_dir, interval=args.interval)
             if args.scene_detect:
