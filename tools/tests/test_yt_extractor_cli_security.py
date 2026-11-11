@@ -1,4 +1,5 @@
 """Regression tests for untrusted YouTube URL handling."""
+
 import importlib.util
 import sys
 import tempfile
