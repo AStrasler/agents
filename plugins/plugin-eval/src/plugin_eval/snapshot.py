@@ -88,7 +88,8 @@ def build_snapshot(plugins_dir: Path) -> dict[str, SnapshotEntry]:
         result = engine.evaluate_skill(skill_dir)
         static = next(lr for lr in result.layers if lr.layer == "static")
         composite = result.composite
-        assert composite is not None  # evaluate_skill always builds a composite
+        if composite is None:
+            raise RuntimeError("evaluate_skill did not produce a composite")
         snap[f"{skill_dir.parent.parent.name}/{skill_dir.name}"] = SnapshotEntry(
             digest=skill_digest(skill_dir),
             static_score=static.score,
