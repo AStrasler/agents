@@ -20,8 +20,11 @@ def test_api_template_restricts_cors_to_local_frontend() -> None:
         node
         for node in ast.walk(tree)
         if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id == "CORSMiddleware"
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "add_middleware"
+        and node.args
+        and isinstance(node.args[0], ast.Name)
+        and node.args[0].id == "CORSMiddleware"
     ]
     assert len(middleware) == 1
 
