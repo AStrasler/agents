@@ -104,7 +104,7 @@ def extract_video_id(url: str) -> str:
             and parsed.port is None
         )
     except ValueError:
-        safe_origin = False
+        sys.exit("Unsupported YouTube URL.")
     if not safe_origin:
         sys.exit("Unsupported YouTube URL.")
 
