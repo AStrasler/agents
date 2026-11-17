@@ -92,3 +92,30 @@ def test_compare_skips_changed_content_and_flags_score_drift() -> None:
     assert result.stale == 1
     assert len(result.diffs) == 1
     assert "p/one" in result.diffs[0]
+
+
+
+def test_build_snapshot_requires_composite(monkeypatch, tmp_path: Path) -> None:
+    from types import SimpleNamespace
+
+    import pytest
+
+    from plugin_eval import snapshot
+
+    skill_md = tmp_path / "plugin" / "skills" / "sample" / "SKILL.md"
+    skill_md.parent.mkdir(parents=True)
+    skill_md.write_text("---\nname: sample\ndescription: Use when x.\n---\ncontent\n")
+
+    class EngineWithoutComposite:
+        def __init__(self, config) -> None:
+            pass
+
+        def evaluate_skill(self, skill_dir: Path):
+            return SimpleNamespace(
+                layers=[SimpleNamespace(layer="static", score=1.0, sub_scores={})],
+                composite=None,
+            )
+
+    monkeypatch.setattr(snapshot, "EvalEngine", EngineWithoutComposite)
+    with pytest.raises(RuntimeError, match="evaluate_skill did not produce a composite"):
+        snapshot.build_snapshot(tmp_path)
