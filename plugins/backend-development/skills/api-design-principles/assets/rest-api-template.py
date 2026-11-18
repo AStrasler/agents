@@ -3,6 +3,8 @@ Production-ready REST API template using FastAPI.
 Includes pagination, filtering, error handling, and best practices.
 """
 
+import os
+
 from fastapi import FastAPI, HTTPException, Query, Path, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -179,4 +181,5 @@ async def delete_user(user_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Keep local use on loopback; deployments can opt in with API_HOST=0.0.0.0.
+    uvicorn.run(app, host=os.getenv("API_HOST", "127.0.0.1"), port=8000)

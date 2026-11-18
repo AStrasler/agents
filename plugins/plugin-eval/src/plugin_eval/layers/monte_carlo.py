@@ -215,7 +215,8 @@ class MonteCarloAnalyzer:
             if isinstance(result, list) and len(result) >= 5:
                 return [str(p) for p in result[:15]]
         except Exception:
-            pass
+            # LLM generation is optional; use the deterministic local variants.
+            return self._fallback_prompts(name, description)
 
         # Fallback: generate basic variants from description
         return self._fallback_prompts(name, description)

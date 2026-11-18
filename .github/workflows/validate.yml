@@ -245,28 +245,42 @@ jobs:
           bun-version: latest
 
       - name: Install OpenCode CLI
-        # Pinned. Without a version the installer asks api.github.com for the
-        # latest release, and shared runners hit the unauthenticated rate limit
-        # ("Failed to fetch version information"). Bump alongside the OpenCode
-        # release notes when the adapter needs a newer CLI.
+        # This immutable release asset is pinned by the published SHA-256 digest.
+        # Bump the version and digest together when the adapter needs a newer CLI.
+        env:
+          OPENCODE_VERSION: "1.18.30"
+          OPENCODE_SHA256: "55007246858165496ff85ba1c2b648f7421e8e2013bf4189a680c9ff8e699d17"
         run: |
-          curl -fsSL https://opencode.ai/install | bash -s -- --version 1.18.30
-          echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
+          archive="$RUNNER_TEMP/opencode-linux-x64.tar.gz"
+          install_dir="$HOME/.opencode/bin"
+          mkdir -p "$install_dir"
+          curl -fsSL --retry 3 --output "$archive" \
+            "https://github.com/anomalyco/opencode/releases/download/v${OPENCODE_VERSION}/opencode-linux-x64.tar.gz"
+          echo "${OPENCODE_SHA256}  ${archive}" | sha256sum --check --strict -
+          tar -xzf "$archive" -C "$install_dir" opencode
+          chmod 755 "$install_dir/opencode"
+          test -x "$install_dir/opencode"
+          "$install_dir/opencode" --version
+          echo "$install_dir" >> "$GITHUB_PATH"
 
       - name: Install Antigravity CLI
-        # Bootstrapper defaults to $HOME/.local/bin; bump alongside any agy
-        # plugin-schema changes it ships. The CDN sometimes returns the script
-        # gzip-compressed, and bash can't run that from a pipe, so the step
-        # downloads it first and decompresses it when needed.
+        # Pin Google's versioned CLI archive and published SHA-512 digest.
+        # Bump the version/build and digest together with any plugin-schema changes.
+        env:
+          AGY_VERSION: "1.5.10-5253791805734912"
+          AGY_SHA512: "713ae840845d74736e2d4a96f5d84e3353d614e73a875793ddf500997ccee09595448cebfd8e94fdd90ce2a0fa97707bd1cc29763dcfe01c945d80c92234378f"
         run: |
-          installer="$RUNNER_TEMP/agy-install.sh"
-          curl -fsSL --compressed --retry 3 -o "$installer" https://antigravity.google/cli/install.sh
-          if gzip -t "$installer" 2>/dev/null; then
-            gunzip -c "$installer" > "$installer.plain"
-            mv "$installer.plain" "$installer"
-          fi
-          bash "$installer"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          archive="$RUNNER_TEMP/agy-linux-x64.tar.gz"
+          extract_dir="$RUNNER_TEMP/agy-extract"
+          install_dir="$HOME/.local/bin"
+          mkdir -p "$extract_dir" "$install_dir"
+          curl -fsSL --retry 3 --output "$archive" \
+            "https://storage.googleapis.com/antigravity-public/antigravity-cli/${AGY_VERSION}/linux-x64/cli_linux_x64.tar.gz"
+          echo "${AGY_SHA512}  ${archive}" | sha512sum --check --strict -
+          tar -xzf "$archive" -C "$extract_dir" antigravity
+          install -m 755 "$extract_dir/antigravity" "$install_dir/agy"
+          "$install_dir/agy" --version
+          echo "$install_dir" >> "$GITHUB_PATH"
 
       - name: Set up Node.js (for npx skills)
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
