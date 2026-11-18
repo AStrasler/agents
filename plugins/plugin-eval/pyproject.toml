@@ -14,6 +14,7 @@ dependencies = [
 [project.optional-dependencies]
 llm = [
     "claude-agent-sdk>=0.2.138",
+    "mcp>=1.30.0,<2",  # Keep the SDK on the maintained 1.x line with the security fixes.
 ]
 dev = [
     "pytest>=9.1.1",
